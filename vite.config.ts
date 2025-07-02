@@ -6,7 +6,7 @@ export default defineConfig({
     lib: {
       entry: "src/index.ts",
       name: "ToneTool",
-      fileName: "tone-tool",
+      fileName: "index",
       formats: ["es", "cjs"],
     },
     rollupOptions: {

@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Chord } from "../Chord";
-import { Scale } from "../Scale";
-import { ChordProgression } from "../ChordProgression";
+import { ChordProgression, Scale } from "../index";
 
 describe("ChordProgression", () => {
   const cMajorScale = new Scale("C", "MAJOR");

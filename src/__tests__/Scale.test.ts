@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Scale } from "../Scale";
+import { Scale } from "../index";
 
 describe("Scale", () => {
   describe("constructor and getNotes", () => {

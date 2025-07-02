@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Chord } from "../Chord";
-import { PitchClassSet } from "../pcs";
+import { Chord } from "../index";
 
 describe("Chord", () => {
   describe("constructor and getNotes", () => {

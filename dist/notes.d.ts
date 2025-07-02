@@ -1,0 +1,21 @@
+export declare const notes: {
+    C: number;
+    "C#": number;
+    Db: number;
+    D: number;
+    "D#": number;
+    Eb: number;
+    E: number;
+    F: number;
+    "F#": number;
+    Gb: number;
+    G: number;
+    "G#": number;
+    Ab: number;
+    A: number;
+    "A#": number;
+    Bb: number;
+    B: number;
+};
+export type NoteName = keyof typeof notes;
+export declare const notesByNumber: Record<number, NoteName[]>;

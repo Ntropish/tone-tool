@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PitchClassSet } from "../pcs";
+import { PitchClassSet } from "../index";
 
 describe("PitchClassSet", () => {
   it("should create a pitch class set from a chord", () => {
