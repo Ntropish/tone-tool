@@ -13,34 +13,68 @@ export class ChordProgression {
     this.chords = chords;
   }
 
-  public static fromRoman(
-    scale: Scale,
-    pattern: ProgressionName | string[]
-  ): ChordProgression {
-    const numeralPattern =
-      typeof pattern === "string" ? popularProgressions[pattern] : pattern;
-    const chords = numeralPattern.map((numeral) => fromRoman(numeral, scale));
+  public static fromRoman(scale: Scale, numerals: string): ChordProgression {
+    const numeralArray = numerals.split("-");
+    const chords = numeralArray.map((numeral) => {
+      if (numeral === "?") {
+        return null;
+      }
+      return fromRoman(numeral, scale);
+    });
     return new ChordProgression(scale, chords);
   }
 
-  public generatePossibilities(config?: {
-    where?: { quality?: ChordName | ChordName[] };
-  }): ChordProgression[] {
+  public static fromBuiltIn(
+    scale: Scale,
+    name: ProgressionName
+  ): ChordProgression {
+    const numeralPattern = popularProgressions[name];
+    return ChordProgression.fromRoman(scale, numeralPattern);
+  }
+
+  public generatePossibilities(): ChordProgression[] {
     const possibilities: ChordProgression[] = [];
-    const firstNullIndex = this.chords.indexOf(null);
 
-    if (firstNullIndex === -1) {
-      // Base case: no nulls, this is a complete progression
-      return [this];
-    }
+    // Get the string representation of the current chord progression
+    const currentProgressionStrings = this.chords.map((chord) =>
+      chord ? chord.toString() : null
+    );
 
-    const availableChords = this.scale.getChords(config);
+    for (const key in popularProgressions) {
+      const popularProgressionName = key as ProgressionName;
+      const popularProgressionNumerals =
+        popularProgressions[popularProgressionName].split("-");
 
-    for (const candidateChord of availableChords) {
-      const newChords = [...this.chords];
-      newChords[firstNullIndex] = candidateChord;
-      const newProgression = new ChordProgression(this.scale, newChords);
-      possibilities.push(...newProgression.generatePossibilities(config));
+      if (
+        popularProgressionNumerals.length !== currentProgressionStrings.length
+      ) {
+        continue; // Lengths don't match, so it can't be a possibility
+      }
+
+      const popularProgressionChords = popularProgressionNumerals.map(
+        (numeral) => fromRoman(numeral, this.scale)
+      );
+      const popularProgressionStrings = popularProgressionChords.map((chord) =>
+        chord.toString()
+      );
+
+      let isMatch = true;
+      for (let i = 0; i < currentProgressionStrings.length; i++) {
+        const currentChord = currentProgressionStrings[i];
+        const popularChord = popularProgressionStrings[i];
+
+        // If the current chord is not null, it must match the popular progression's chord
+        if (currentChord !== null && currentChord !== popularChord) {
+          isMatch = false;
+          break;
+        }
+      }
+
+      if (isMatch) {
+        possibilities.push(
+          new ChordProgression(this.scale, popularProgressionChords)
+        );
+      }
     }
 
     return possibilities;
