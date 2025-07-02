@@ -26,8 +26,7 @@ pnpm add tone-tool
 Creating and working with chords is simple and intuitive.
 
 ```typescript
-import { Chord } from "./Chord";
-import { intervals } from "./intervals";
+import { Chord, intervals } from "tone-tool";
 
 // Create a new C Major chord
 const cMajor = new Chord("C", "MAJOR");
@@ -60,7 +59,7 @@ console.log(dbMajor.getNames());
 Scales follow a similar, easy-to-use API.
 
 ```typescript
-import { Scale } from "./Scale";
+import { Scale } from "tone-tool";
 
 // Create a new C Ionian (Major) scale
 const cMajorScale = new Scale("C", "IONIAN");
@@ -127,7 +126,7 @@ console.log(lydianModes.map((s) => s.toString()));
 For advanced use cases, you can work directly with the underlying `PitchClassSet`, which uses a 12-bit integer as a bitmask to represent the 12 notes of the chromatic scale.
 
 ```typescript
-import { PitchClassSet } from "./pcs";
+import { PitchClassSet } from "tone-tool";
 
 // C Major triad (notes C, E, G are the 1st, 5th, and 8th bits)
 const cMajorMask = 0b000010010001;
