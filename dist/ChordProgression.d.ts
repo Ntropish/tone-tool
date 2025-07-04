@@ -7,6 +7,8 @@ export declare class ChordProgression {
     constructor(scale: Scale, chords: (Chord | null)[]);
     static fromRoman(scale: Scale, numerals: string): ChordProgression;
     static fromBuiltIn(scale: Scale, name: ProgressionName): ChordProgression;
-    generatePossibilities(): ChordProgression[];
+    generatePossibilities(options?: {
+        exactLength?: boolean;
+    }): ChordProgression[];
     toStrings(): string[];
 }

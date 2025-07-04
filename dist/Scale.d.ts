@@ -6,8 +6,8 @@ import { ChordName } from './chords';
 export declare class Scale {
     pcs: PitchClassSet;
     tonic: NoteName;
-    mode: ModeName;
-    constructor(tonic: NoteName, mode: ModeName);
+    constructor(tonic: NoteName, pcs: PitchClassSet);
+    static build(tonic: NoteName, mode: ModeName): Scale;
     getNotes(): ("C" | "C#" | "Db" | "D" | "D#" | "Eb" | "E" | "F" | "F#" | "Gb" | "G" | "G#" | "Ab" | "A" | "A#" | "Bb" | "B")[];
     transpose(interval: number): Scale;
     getChords(config?: {

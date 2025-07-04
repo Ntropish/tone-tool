@@ -13,6 +13,15 @@ export class Chord {
     this.pcs = pcs;
   }
 
+  toString() {
+    const firstQuality = this.getQualities()[0];
+    return `${this.tonic} ${firstQuality}`;
+  }
+
+  get [Symbol.toStringTag]() {
+    return this.toString() || `Unknown Chord: ${this.tonic} ${this.pcs}`;
+  }
+
   public static build(tonic: NoteName, shape: ChordName): Chord {
     const pcs = PitchClassSet.fromChord(tonic, shape);
     return new Chord(tonic, pcs);
@@ -65,41 +74,35 @@ export class Chord {
         const scaleMask = scalePcs.Bitmask;
 
         if ((scaleMask & chordMask) === chordMask) {
-          matchingScales.push(new Scale(tonic, mode));
+          matchingScales.push(Scale.build(tonic, mode));
         }
       }
     }
     return matchingScales;
   }
 
-  public getQualities() {
-    const allQualities = Object.keys(chords) as ChordName[];
-    const chordMask = this.pcs.Bitmask;
-    return allQualities.filter(
-      (quality) => (chords[quality] & chordMask) === chordMask
-    );
-  }
+  public getQualities(): string[] {
+    // 1. for each chord,
+    // 2. transpose the chord to the local tonic
+    // 3. if the chord matches the local tonic, add the chord name to the set
+    // 4. return the set of chord names
 
-  public toString() {
-    return `${this.tonic} ${this.pcs.toString()}`;
-  }
-
-  public getNames(): string[] {
     const names = new Set<string>();
     const thisMask = this.pcs.Bitmask;
 
-    for (const tonicName of Object.keys(notes) as NoteName[]) {
-      const tonicInterval = Math.log2(notes[tonicName]);
+    const tonicInterval = Math.log2(notes[this.tonic]);
 
-      for (const qualityName of Object.keys(chords) as ChordName[]) {
-        const qualityMask = chords[qualityName];
-        const newPcs = new PitchClassSet(qualityMask).transpose(tonicInterval);
-
-        if (newPcs.Bitmask === thisMask) {
-          names.add(`${tonicName} ${qualityName}`);
-        }
+    for (const [quality, mask] of Object.entries(chords)) {
+      const newPcs = new PitchClassSet(mask).transpose(tonicInterval);
+      if (newPcs.Bitmask === thisMask) {
+        names.add(quality);
       }
     }
+
     return Array.from(names);
+  }
+
+  public getNames(): string[] {
+    return this.getQualities().map((quality) => `${this.tonic} ${quality}`);
   }
 }

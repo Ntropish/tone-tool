@@ -279,6 +279,13 @@ class PitchClassSet {
   constructor(bitmask) {
     this.bitmask = bitmask & 4095;
   }
+  // to string
+  toString() {
+    return this.bitmask.toString(2).padStart(12, "0");
+  }
+  get [Symbol.toStringTag]() {
+    return this.toString();
+  }
   static fromChord(tonic, chord) {
     const tonicInterval = Math.log2(notes[tonic]);
     const chordMask = chords[chord];
@@ -324,10 +331,6 @@ class PitchClassSet {
   transpose(interval) {
     return new PitchClassSet(transpose(this.bitmask, interval));
   }
-  // to string
-  toString() {
-    return this.bitmask.toString(2).padStart(12, "0");
-  }
 }
 function transpose(bitmask, interval) {
   const n = (interval % 12 + 12) % 12;
@@ -337,10 +340,14 @@ function transpose(bitmask, interval) {
   return (bitmask << n | bitmask >> 12 - n) & 4095;
 }
 class Scale {
-  constructor(tonic, mode) {
+  // public mode: ModeName;
+  constructor(tonic, pcs) {
     this.tonic = tonic;
-    this.mode = mode;
-    this.pcs = PitchClassSet.fromMode(tonic, mode);
+    this.pcs = pcs;
+  }
+  static build(tonic, mode) {
+    const pcs = PitchClassSet.fromMode(tonic, mode);
+    return new Scale(tonic, pcs);
   }
   getNotes() {
     const allNotes = this.pcs.getNotes();
@@ -356,7 +363,7 @@ class Scale {
     const newTonicIndex = (currentTonicIndex + interval % 12 + 12) % 12;
     const newTonicBit = 1 << newTonicIndex;
     const newTonicName = notesByNumber[newTonicBit][0];
-    return new Scale(newTonicName, this.mode);
+    return new Scale(newTonicName, this.pcs.transpose(interval));
   }
   getChords(config) {
     const matchingChords = [];
@@ -371,7 +378,7 @@ class Scale {
         const chordPcs = PitchClassSet.fromChord(tonic, quality);
         const chordMask = chordPcs.Bitmask;
         if ((scaleMask & chordMask) === chordMask) {
-          matchingChords.push(new Chord(tonic, quality));
+          matchingChords.push(Chord.build(tonic, quality));
         }
       }
     }
@@ -393,14 +400,17 @@ class Scale {
     return Array.from(names);
   }
   toString() {
-    return `${this.tonic} ${this.mode}`;
+    return `${this.tonic} ${this.pcs.toString()}`;
   }
 }
 class Chord {
-  constructor(tonic, quality) {
+  constructor(tonic, pcs) {
     this.tonic = tonic;
-    this.quality = quality;
-    this.pcs = PitchClassSet.fromChord(tonic, quality);
+    this.pcs = pcs;
+  }
+  static build(tonic, shape) {
+    const pcs = PitchClassSet.fromChord(tonic, shape);
+    return new Chord(tonic, pcs);
   }
   getNotes() {
     const allNotes = this.pcs.getNotes();
@@ -415,7 +425,7 @@ class Chord {
     const newTonicIndex = (currentTonicIndex + interval % 12 + 12) % 12;
     const newTonicBit = 1 << newTonicIndex;
     const newTonicName = notesByNumber[newTonicBit][0];
-    return new Chord(newTonicName, this.quality);
+    return new Chord(newTonicName, this.pcs.transpose(interval));
   }
   getScales(config) {
     const matchingScales = [];
@@ -429,14 +439,24 @@ class Chord {
         const scalePcs = PitchClassSet.fromMode(tonic, mode);
         const scaleMask = scalePcs.Bitmask;
         if ((scaleMask & chordMask) === chordMask) {
-          matchingScales.push(new Scale(tonic, mode));
+          matchingScales.push(Scale.build(tonic, mode));
         }
       }
     }
     return matchingScales;
   }
+  getQualities() {
+    const allQualities = Object.keys(chords);
+    const chordMask = this.pcs.Bitmask;
+    return allQualities.filter(
+      (quality) => (chords[quality] & chordMask) === chordMask
+    );
+  }
   toString() {
-    return `${this.tonic} ${this.quality}`;
+    return this.getNames()[0];
+  }
+  get [Symbol.toStringTag]() {
+    return this.toString();
   }
   getNames() {
     const names = /* @__PURE__ */ new Set();
@@ -518,7 +538,8 @@ class ChordProgression {
     const numeralPattern = popularProgressions[name];
     return ChordProgression.fromRoman(scale, numeralPattern);
   }
-  generatePossibilities() {
+  generatePossibilities(options = {}) {
+    const { exactLength = true } = options;
     const possibilities = [];
     const currentProgressionStrings = this.chords.map(
       (chord) => chord ? chord.toString() : null
@@ -526,7 +547,7 @@ class ChordProgression {
     for (const key in popularProgressions) {
       const popularProgressionName = key;
       const popularProgressionNumerals = popularProgressions[popularProgressionName].split("-");
-      if (popularProgressionNumerals.length !== currentProgressionStrings.length) {
+      if (exactLength && popularProgressionNumerals.length !== currentProgressionStrings.length) {
         continue;
       }
       const popularProgressionChords = popularProgressionNumerals.map(
@@ -538,10 +559,11 @@ class ChordProgression {
       let isMatch = true;
       for (let i = 0; i < currentProgressionStrings.length; i++) {
         const currentChord = currentProgressionStrings[i];
-        const popularChord = popularProgressionStrings[i];
-        if (currentChord !== null && currentChord !== popularChord) {
-          isMatch = false;
-          break;
+        if (currentChord !== null) {
+          if (i >= popularProgressionStrings.length || currentChord !== popularProgressionStrings[i]) {
+            isMatch = false;
+            break;
+          }
         }
       }
       if (isMatch) {
@@ -581,7 +603,9 @@ export {
   chords,
   fromRoman,
   intervals,
+  modes,
   notes,
   notesByNumber,
-  popularProgressions
+  popularProgressions,
+  scaleModes
 };

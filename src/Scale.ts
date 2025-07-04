@@ -1,5 +1,5 @@
 import { PitchClassSet } from "./pcs";
-import { ModeName, modes } from "./scales";
+import { ModeName, modes, scaleModes } from "./scales";
 import { NoteName, notes, notesByNumber } from "./notes";
 import { Chord } from "./Chord";
 import { ChordName, chords } from "./chords";
@@ -71,7 +71,7 @@ export class Scale {
         const chordMask = chordPcs.Bitmask;
 
         if ((scaleMask & chordMask) === chordMask) {
-          matchingChords.push(new Chord(tonic, quality));
+          matchingChords.push(Chord.build(tonic, quality));
         }
       }
     }
@@ -79,26 +79,35 @@ export class Scale {
     return matchingChords;
   }
 
-  public getNames(): string[] {
+  // 1. transpose the local scale to the c-based standard
+  // 2. for each chord,
+  // 3. if the chord matches the transposed scale, add the chord name to the set
+  // 4. return the set of chord names
+
+  public getQualities(): string[] {
     const names = new Set<string>();
-    const thisMask = this.pcs.Bitmask;
 
-    for (const tonicName of Object.keys(notes) as NoteName[]) {
-      const tonicInterval = Math.log2(notes[tonicName]);
+    const tonicInterval = Math.log2(notes[this.tonic]);
+    const transposedPcs = this.pcs.transpose(-tonicInterval);
 
-      for (const modeName of Object.keys(modes) as ModeName[]) {
-        const modeMask = modes[modeName];
-        const newPcs = new PitchClassSet(modeMask).transpose(tonicInterval);
-
-        if (newPcs.Bitmask === thisMask) {
-          names.add(`${tonicName} ${modeName}`);
-        }
+    for (const [quality, mask] of Object.entries(modes)) {
+      if (mask === transposedPcs.Bitmask) {
+        names.add(quality);
       }
     }
+
     return Array.from(names);
   }
 
+  public getNames(): string[] {
+    return this.getQualities().map((quality) => `${this.tonic} ${quality}`);
+  }
+
   public toString() {
-    return `${this.tonic} ${this.pcs.toString()}`;
+    return this.getNames()[0];
+  }
+
+  get [Symbol.toStringTag]() {
+    return this.toString() || `Unknown Scale: ${this.tonic} ${this.pcs}`;
   }
 }

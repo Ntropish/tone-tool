@@ -24,6 +24,7 @@ describe("Chord", () => {
       const c7 = g7.transpose(5);
       expect(c7.tonic).toBe("C");
       expect(c7.getNotes()).toEqual(["C", "E", "G", "A#"]);
+      expect(c7.toString()).toEqual("C DOMINANT7");
     });
 
     it("should handle transpositions that cross the octave boundary, like B Major down a minor third", () => {
@@ -46,7 +47,7 @@ describe("Chord", () => {
   describe("getNames", () => {
     it("should find all enharmonic equivalents for a common chord, like C# Major", () => {
       const cSharpMajor = Chord.build("C#", "MAJOR");
-      const names = cSharpMajor.getNames();
+      const names = cSharpMajor.getQualities();
       expect(names).toContain("C# MAJOR");
       expect(names).toContain("Db MAJOR");
       expect(names).toContain("C# MAJ");
@@ -55,7 +56,7 @@ describe("Chord", () => {
 
     it("should identify complex chords with multiple names, like G# diminished 7th", () => {
       const gSharpDim7 = Chord.build("G#", "DIMINISHED7");
-      const names = gSharpDim7.getNames();
+      const names = gSharpDim7.getQualities();
       expect(names).toContain("G# DIM7");
       expect(names).toContain("B DIM7");
       expect(names).toContain("D DIM7");

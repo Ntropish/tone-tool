@@ -10,6 +10,16 @@ export class PitchClassSet {
   public constructor(bitmask: number) {
     this.bitmask = bitmask & 4095;
   }
+
+  // to string
+  toString() {
+    return this.bitmask.toString(2).padStart(12, "0");
+  }
+
+  get [Symbol.toStringTag]() {
+    return this.toString();
+  }
+
   public static fromChord(tonic: NoteName, chord: ChordName) {
     const tonicInterval = Math.log2(notes[tonic]);
     const chordMask = chords[chord];
@@ -61,11 +71,6 @@ export class PitchClassSet {
 
   public transpose(interval: number) {
     return new PitchClassSet(transpose(this.bitmask, interval));
-  }
-
-  // to string
-  public toString() {
-    return this.bitmask.toString(2).padStart(12, "0");
   }
 }
 

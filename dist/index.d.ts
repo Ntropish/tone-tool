@@ -2,7 +2,7 @@ export * from './ChordProgression';
 export * from './Scale';
 export * from './romanNumerals';
 export * from './progressions';
-export * from './Scale';
+export * from './scales';
 export * from './romanNumerals';
 export * from './progressions';
 export * from './chords';
