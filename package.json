@@ -2,6 +2,10 @@
   "name": "tone-tool",
   "version": "2.0.0",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ntropish/tone-tool"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
