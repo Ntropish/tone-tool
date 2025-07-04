@@ -97,13 +97,12 @@ describe("ChordProgression", () => {
       ]);
     });
 
-    it.only("should work for a different key (D Major)", () => {
+    it("should work for a different key (D Major)", () => {
       const dMajorScale = Scale.build("D", "MAJOR");
       const progression = ChordProgression.fromRoman(dMajorScale, "?-V-?-IV");
       const possibilities = progression.generatePossibilities({
         exactLength: true,
       });
-      console.log(possibilities);
       expect(possibilities).toHaveLength(1);
       expect(possibilities[0].toStrings()).toEqual([
         "D MAJOR", // from I-V-vi-IV

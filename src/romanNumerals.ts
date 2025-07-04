@@ -1,8 +1,9 @@
 import { Chord } from "./Chord";
+import { ChordName } from "./chords";
 import { NoteName, notes } from "./notes";
 import { Scale } from "./Scale";
 
-const numeralMap: Record<string, { degree: number; quality: string }> = {
+const numeralMap: Record<string, { degree: number; quality: ChordName }> = {
   // Major
   I: { degree: 1, quality: "MAJOR" },
   ii: { degree: 2, quality: "MINOR" },
@@ -48,8 +49,7 @@ export function fromRoman(numeral: string, scale: Scale): Chord {
       ) as NoteName)
     : tonicNote;
 
-  // This is a simplification; a more robust solution would handle qualities better.
-  const quality = mapping.quality as any;
+  const quality = mapping.quality;
 
-  return new Chord(finalTonic, quality);
+  return Chord.build(finalTonic, quality);
 }

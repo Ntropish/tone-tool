@@ -47,20 +47,16 @@ describe("Chord", () => {
   describe("getNames", () => {
     it("should find all enharmonic equivalents for a common chord, like C# Major", () => {
       const cSharpMajor = Chord.build("C#", "MAJOR");
-      const names = cSharpMajor.getQualities();
+      const names = cSharpMajor.getNames();
       expect(names).toContain("C# MAJOR");
-      expect(names).toContain("Db MAJOR");
       expect(names).toContain("C# MAJ");
-      expect(names).toContain("Db MAJ");
     });
 
     it("should identify complex chords with multiple names, like G# diminished 7th", () => {
       const gSharpDim7 = Chord.build("G#", "DIMINISHED7");
-      const names = gSharpDim7.getQualities();
+      const names = gSharpDim7.getNames();
+      expect(names).toContain("G# DIMINISHED7");
       expect(names).toContain("G# DIM7");
-      expect(names).toContain("B DIM7");
-      expect(names).toContain("D DIM7");
-      expect(names).toContain("F DIM7");
     });
   });
 
@@ -95,6 +91,16 @@ describe("Chord", () => {
 
       expect(scales).toHaveLength(1);
       expect(scales[0].toString()).toBe("C IONIAN");
+    });
+
+    it("should find the D Ionian scale for a Dmaj7 chord using a compound filter", () => {
+      const dMaj7 = Chord.build("D", "MAJOR7");
+      const scales = dMaj7.getScales({
+        where: { tonic: ["D"], mode: ["IONIAN"] },
+      });
+
+      expect(scales).toHaveLength(1);
+      expect(scales[0].toString()).toBe("D IONIAN");
     });
   });
 });

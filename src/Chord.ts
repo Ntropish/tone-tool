@@ -91,10 +91,10 @@ export class Chord {
     const thisMask = this.pcs.Bitmask;
 
     const tonicInterval = Math.log2(notes[this.tonic]);
+    const transposedPcs = this.pcs.transpose(-tonicInterval);
 
     for (const [quality, mask] of Object.entries(chords)) {
-      const newPcs = new PitchClassSet(mask).transpose(tonicInterval);
-      if (newPcs.Bitmask === thisMask) {
+      if (mask === transposedPcs.Bitmask) {
         names.add(quality);
       }
     }
