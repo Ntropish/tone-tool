@@ -52,4 +52,4 @@ const possibilities = progression.generatePossibilities();
 
 ## Documentation
 
-For more detailed information and API documentation, please see the [docs](./docs/index.md) folder.
+For more detailed information and API documentation, please see the [docs](https://github.com/Ntropish/tone-tool/blob/main/docs/index.md) folder.
