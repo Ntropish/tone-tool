@@ -45,7 +45,7 @@ export function fromRoman(numeral: string, scale: Scale): Chord {
   const isBorrowed = numeral.startsWith("b");
   const finalTonic = isBorrowed
     ? (Object.keys(notes).find(
-        (n) => notes[n as NoteName] === notes[tonicNote] - 1
+        (n) => notes[n as NoteName] === 2 ** (Math.log2(notes[tonicNote]) - 1)
       ) as NoteName)
     : tonicNote;
 

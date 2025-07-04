@@ -23,6 +23,12 @@ export class Chord {
   }
 
   public static build(tonic: NoteName, shape: ChordName): Chord {
+    if (!notes[tonic]) {
+      throw new Error(`Invalid tonic: ${tonic}`);
+    }
+    if (!chords[shape]) {
+      throw new Error(`Invalid chord quality: ${shape}`);
+    }
     const pcs = PitchClassSet.fromChord(tonic, shape);
     return new Chord(tonic, pcs);
   }

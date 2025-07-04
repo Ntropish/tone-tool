@@ -16,6 +16,26 @@ describe("Chord", () => {
       expect(chord.pcs.toString()).toBe("001001000010");
       expect(chord.getNotes()).toEqual(["F#", "A", "C#"]);
     });
+
+    it("should throw an error for an invalid chord quality", () => {
+      expect(() => Chord.build("C", "INVALID" as any)).toThrow();
+    });
+
+    it("should throw an error for an invalid chord quality", () => {
+      expect(() => Chord.build("D", "inv" as any)).toThrow();
+    });
+
+    it("should throw an error for an invalid tonic", () => {
+      expect(() => Chord.build("INVALID" as any, "MAJOR")).toThrow();
+    });
+
+    it("should throw an error for an invalid tonic", () => {
+      expect(() => Chord.build("inv" as any, "MAJOR")).toThrow();
+    });
+
+    it("should throw an error for both invalid tonic and quality", () => {
+      expect(() => Chord.build("inv" as any, "inv" as any)).toThrow();
+    });
   });
 
   describe("transpose", () => {
