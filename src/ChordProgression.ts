@@ -32,7 +32,10 @@ export class ChordProgression {
     return ChordProgression.fromRoman(scale, numeralPattern);
   }
 
-  public generatePossibilities(): ChordProgression[] {
+  public generatePossibilities(
+    options: { exactLength?: boolean } = {}
+  ): ChordProgression[] {
+    const { exactLength = true } = options;
     const possibilities: ChordProgression[] = [];
 
     // Get the string representation of the current chord progression
@@ -46,6 +49,7 @@ export class ChordProgression {
         popularProgressions[popularProgressionName].split("-");
 
       if (
+        exactLength &&
         popularProgressionNumerals.length !== currentProgressionStrings.length
       ) {
         continue; // Lengths don't match, so it can't be a possibility
@@ -61,12 +65,16 @@ export class ChordProgression {
       let isMatch = true;
       for (let i = 0; i < currentProgressionStrings.length; i++) {
         const currentChord = currentProgressionStrings[i];
-        const popularChord = popularProgressionStrings[i];
 
         // If the current chord is not null, it must match the popular progression's chord
-        if (currentChord !== null && currentChord !== popularChord) {
-          isMatch = false;
-          break;
+        if (currentChord !== null) {
+          if (
+            i >= popularProgressionStrings.length ||
+            currentChord !== popularProgressionStrings[i]
+          ) {
+            isMatch = false;
+            break;
+          }
         }
       }
 
