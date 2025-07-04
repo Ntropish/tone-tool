@@ -4,14 +4,13 @@ import { Scale } from "../index";
 describe("Scale", () => {
   describe("constructor and getNotes", () => {
     it("should correctly create a C Ionian (Major) scale", () => {
-      const scale = new Scale("C", "IONIAN");
+      const scale = Scale.build("C", "IONIAN");
       expect(scale.tonic).toBe("C");
-      expect(scale.mode).toBe("IONIAN");
       expect(scale.getNotes()).toEqual(["C", "D", "E", "F", "G", "A", "B"]);
     });
 
     it("should correctly create an Eb Dorian scale", () => {
-      const scale = new Scale("Eb", "DORIAN");
+      const scale = Scale.build("Eb", "DORIAN");
       expect(scale.tonic).toBe("Eb");
       expect(scale.getNotes()).toEqual([
         "D#",
@@ -25,7 +24,7 @@ describe("Scale", () => {
     });
 
     it("should correctly create an A Minor Pentatonic scale", () => {
-      const scale = new Scale("A", "MINOR_PENTATONIC");
+      const scale = Scale.build("A", "MINOR_PENTATONIC");
       expect(scale.tonic).toBe("A");
       expect(scale.getNotes()).toEqual(["A", "C", "D", "E", "G"]);
     });
@@ -33,15 +32,14 @@ describe("Scale", () => {
 
   describe("transpose", () => {
     it("should transpose a G Mixolydian scale up a major second to A Mixolydian", () => {
-      const gMixo = new Scale("G", "MIXOLYDIAN");
+      const gMixo = Scale.build("G", "MIXOLYDIAN");
       const aMixo = gMixo.transpose(2);
       expect(aMixo.tonic).toBe("A");
-      expect(aMixo.mode).toBe("MIXOLYDIAN");
       expect(aMixo.getNotes()).toEqual(["A", "B", "C#", "D", "E", "F#", "G"]);
     });
 
     it("should transpose a D Lydian scale down a perfect fourth to A Lydian", () => {
-      const dLydian = new Scale("D", "LYDIAN");
+      const dLydian = Scale.build("D", "LYDIAN");
       const aLydian = dLydian.transpose(-5);
       expect(aLydian.tonic).toBe("A");
       expect(aLydian.getNotes()).toEqual([
@@ -58,14 +56,14 @@ describe("Scale", () => {
 
   describe("getNames", () => {
     it("should find all names for C Ionian, including its alias 'Major'", () => {
-      const cMajor = new Scale("C", "IONIAN");
+      const cMajor = Scale.build("C", "IONIAN");
       const names = cMajor.getNames();
       expect(names).toContain("C IONIAN");
       expect(names).toContain("C MAJOR");
     });
 
     it("should find all relative modes for G Aeolian", () => {
-      const gMinor = new Scale("G", "AEOLIAN");
+      const gMinor = Scale.build("G", "AEOLIAN");
       const names = gMinor.getNames();
       expect(names).toContain("G AEOLIAN");
       expect(names).toContain("G NATURAL_MINOR");
@@ -75,7 +73,7 @@ describe("Scale", () => {
     });
 
     it("should correctly identify symmetrical scales, like C Whole Tone", () => {
-      const cWhole = new Scale("C", "WHOLE_TONE");
+      const cWhole = Scale.build("C", "WHOLE_TONE");
       const names = cWhole.getNames();
       expect(names).toHaveLength(9);
       expect(names).toContain("C WHOLE_TONE");
@@ -85,7 +83,7 @@ describe("Scale", () => {
 
   describe("getChords", () => {
     it("should find all 7 diatonic major, minor, and diminished triads in C Major", () => {
-      const cMajor = new Scale("C", "MAJOR");
+      const cMajor = Scale.build("C", "MAJOR");
       const diatonicChords = cMajor.getChords({
         where: { quality: ["MAJOR", "MINOR", "DIMINISHED"] },
       });
@@ -102,7 +100,7 @@ describe("Scale", () => {
     });
 
     it("should find only the minor chords in A Natural Minor using the 'where' filter", () => {
-      const aMinor = new Scale("A", "NATURAL_MINOR");
+      const aMinor = Scale.build("A", "NATURAL_MINOR");
       const minorChords = aMinor.getChords({ where: { quality: "MINOR" } });
       const chordNames = minorChords.map((c) => c.toString());
 
@@ -113,7 +111,7 @@ describe("Scale", () => {
     });
 
     it("should find the V chord (G7) of C Major using a compound filter", () => {
-      const cMajor = new Scale("C", "MAJOR");
+      const cMajor = Scale.build("C", "MAJOR");
       const vChord = cMajor.getChords({
         where: { note: "G", quality: "DOMINANT7" },
       });

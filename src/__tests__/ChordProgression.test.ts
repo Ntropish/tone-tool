@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { ChordProgression, Scale } from "../index";
 
 describe("ChordProgression", () => {
-  const cMajorScale = new Scale("C", "MAJOR");
+  const cMajorScale = Scale.build("C", "MAJOR");
 
   describe("fromRoman", () => {
     it("should create a progression from a dash-separated string of Roman numerals", () => {
@@ -37,7 +37,7 @@ describe("ChordProgression", () => {
     });
 
     it("should create the 'Pachelbel's Canon' progression", () => {
-      const dMajorScale = new Scale("D", "MAJOR");
+      const dMajorScale = Scale.build("D", "MAJOR");
       const progression = ChordProgression.fromBuiltIn(
         dMajorScale,
         "Pachelbel's Canon"
@@ -98,7 +98,7 @@ describe("ChordProgression", () => {
     });
 
     it("should work for a different key (D Major)", () => {
-      const dMajorScale = new Scale("D", "MAJOR");
+      const dMajorScale = Scale.build("D", "MAJOR");
       const progression = ChordProgression.fromRoman(dMajorScale, "?-V-?-IV");
       const possibilities = progression.generatePossibilities();
       expect(possibilities).toHaveLength(1);

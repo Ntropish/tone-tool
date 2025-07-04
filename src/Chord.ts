@@ -7,12 +7,15 @@ import { ModeName, modes } from "./scales";
 export class Chord {
   public pcs: PitchClassSet;
   public tonic: NoteName;
-  public quality: ChordName;
 
-  public constructor(tonic: NoteName, quality: ChordName) {
+  public constructor(tonic: NoteName, pcs: PitchClassSet) {
     this.tonic = tonic;
-    this.quality = quality;
-    this.pcs = PitchClassSet.fromChord(tonic, quality);
+    this.pcs = pcs;
+  }
+
+  public static build(tonic: NoteName, shape: ChordName): Chord {
+    const pcs = PitchClassSet.fromChord(tonic, shape);
+    return new Chord(tonic, pcs);
   }
 
   public getNotes() {
@@ -30,7 +33,7 @@ export class Chord {
     const newTonicBit = 1 << newTonicIndex;
     const newTonicName = notesByNumber[newTonicBit][0];
 
-    return new Chord(newTonicName, this.quality);
+    return new Chord(newTonicName, this.pcs.transpose(interval));
   }
 
   public getScales(config?: {
@@ -69,8 +72,16 @@ export class Chord {
     return matchingScales;
   }
 
+  public getQualities() {
+    const allQualities = Object.keys(chords) as ChordName[];
+    const chordMask = this.pcs.Bitmask;
+    return allQualities.filter(
+      (quality) => (chords[quality] & chordMask) === chordMask
+    );
+  }
+
   public toString() {
-    return `${this.tonic} ${this.quality}`;
+    return `${this.tonic} ${this.pcs.toString()}`;
   }
 
   public getNames(): string[] {
