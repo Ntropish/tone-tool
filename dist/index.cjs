@@ -386,29 +386,42 @@ class Scale {
     }
     return matchingChords;
   }
-  getNames() {
+  // 1. transpose the local scale to the c-based standard
+  // 2. for each chord,
+  // 3. if the chord matches the transposed scale, add the chord name to the set
+  // 4. return the set of chord names
+  getQualities() {
     const names = /* @__PURE__ */ new Set();
-    const thisMask = this.pcs.Bitmask;
-    for (const tonicName of Object.keys(notes)) {
-      const tonicInterval = Math.log2(notes[tonicName]);
-      for (const modeName of Object.keys(modes)) {
-        const modeMask = modes[modeName];
-        const newPcs = new PitchClassSet(modeMask).transpose(tonicInterval);
-        if (newPcs.Bitmask === thisMask) {
-          names.add(`${tonicName} ${modeName}`);
-        }
+    const tonicInterval = Math.log2(notes[this.tonic]);
+    const transposedPcs = this.pcs.transpose(-tonicInterval);
+    for (const [quality, mask] of Object.entries(modes)) {
+      if (mask === transposedPcs.Bitmask) {
+        names.add(quality);
       }
     }
     return Array.from(names);
   }
+  getNames() {
+    return this.getQualities().map((quality) => `${this.tonic} ${quality}`);
+  }
   toString() {
-    return `${this.tonic} ${this.pcs.toString()}`;
+    return this.getNames()[0];
+  }
+  get [Symbol.toStringTag]() {
+    return this.toString() || `Unknown Scale: ${this.tonic} ${this.pcs}`;
   }
 }
 class Chord {
   constructor(tonic, pcs) {
     this.tonic = tonic;
     this.pcs = pcs;
+  }
+  toString() {
+    const firstQuality = this.getQualities()[0];
+    return `${this.tonic} ${firstQuality}`;
+  }
+  get [Symbol.toStringTag]() {
+    return this.toString() || `Unknown Chord: ${this.tonic} ${this.pcs}`;
   }
   static build(tonic, shape) {
     const pcs = PitchClassSet.fromChord(tonic, shape);
@@ -448,32 +461,19 @@ class Chord {
     return matchingScales;
   }
   getQualities() {
-    const allQualities = Object.keys(chords);
-    const chordMask = this.pcs.Bitmask;
-    return allQualities.filter(
-      (quality) => (chords[quality] & chordMask) === chordMask
-    );
-  }
-  toString() {
-    return this.getNames()[0];
-  }
-  get [Symbol.toStringTag]() {
-    return this.toString();
-  }
-  getNames() {
     const names = /* @__PURE__ */ new Set();
-    const thisMask = this.pcs.Bitmask;
-    for (const tonicName of Object.keys(notes)) {
-      const tonicInterval = Math.log2(notes[tonicName]);
-      for (const qualityName of Object.keys(chords)) {
-        const qualityMask = chords[qualityName];
-        const newPcs = new PitchClassSet(qualityMask).transpose(tonicInterval);
-        if (newPcs.Bitmask === thisMask) {
-          names.add(`${tonicName} ${qualityName}`);
-        }
+    this.pcs.Bitmask;
+    const tonicInterval = Math.log2(notes[this.tonic]);
+    const transposedPcs = this.pcs.transpose(-tonicInterval);
+    for (const [quality, mask] of Object.entries(chords)) {
+      if (mask === transposedPcs.Bitmask) {
+        names.add(quality);
       }
     }
     return Array.from(names);
+  }
+  getNames() {
+    return this.getQualities().map((quality) => `${this.tonic} ${quality}`);
   }
 }
 const numeralMap = {
@@ -519,7 +519,7 @@ function fromRoman(numeral, scale) {
     (n) => notes[n] === notes[tonicNote] - 1
   ) : tonicNote;
   const quality = mapping.quality;
-  return new Chord(finalTonic, quality);
+  return Chord.build(finalTonic, quality);
 }
 class ChordProgression {
   constructor(scale, chords2) {

@@ -16,6 +16,8 @@ export declare class Scale {
             quality?: ChordName | ChordName[];
         };
     }): Chord[];
+    getQualities(): string[];
     getNames(): string[];
     toString(): string;
+    get [Symbol.toStringTag](): string;
 }
